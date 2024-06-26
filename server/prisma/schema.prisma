@@ -25,6 +25,7 @@ model User {
   email               String         @unique
   avatar              String?
   password            String
+  bio                 String?        @db.Text
   role                Role           @default(USER)
   confirmedEmail      Boolean        @default(false)
   pictures            Picture[]
@@ -55,9 +56,11 @@ model Message {
 
 model Picture {
   id          Int        @id @default(autoincrement())
+  slug        String     @unique
   User        User?      @relation(fields: [userId], references: [id])
   userId      Int?
-  description String
+  title       String
+  description String     @db.Text
   image       String
   isVisibile  Boolean    @default(true)
   comments    Comment[]
