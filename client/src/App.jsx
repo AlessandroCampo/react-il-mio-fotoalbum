@@ -4,15 +4,31 @@ import {
     RouterProvider,
 } from "react-router-dom";
 import { GlobalProvider } from "./contexts/globalContext";
+import Home from "./views/Home";
+import MainLayout from "./layouts/MainLayout";
+import Single from "./views/Single";
 
 
 const router = createBrowserRouter([
     {
         path: '/',
-        element:
+        element: (
             <GlobalProvider>
-                <h2 className="text-white">Home</h2>
+                <MainLayout>
+
+                </MainLayout>
             </GlobalProvider>
+        ),
+        children: [
+            {
+                path: '/',
+                element: <Home />
+            },
+            {
+                path: '/pin/:slug',
+                element: <Single />
+            },
+        ]
     },
     {
         path: '/login',
@@ -29,7 +45,6 @@ const app = function () {
     return (
         <RouterProvider
             router={router}
-
         />
     )
 }

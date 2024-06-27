@@ -12,9 +12,9 @@ const validator = require('../middlewares/validator.js');
 const { pictureCreateSchema } = require('../validations/pictureValidation.js')
 
 
-router.get('/', auth, index);
+router.get('/', index);
 router.post('/', handleFileUplaod, auth, validator(pictureCreateSchema), create);
-router.get('/:slug', auth, show);
+router.get('/:slug', show);
 router.delete('/:slug', auth, isUserPicture, destroy);
 router.patch(':/slug/change-visibility', isUserPicture, auth, hideOrShow);
 router.patch(':/slug', isUserPicture, auth, update);

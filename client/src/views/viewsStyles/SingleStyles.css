@@ -1,0 +1,35 @@
+.single-page-container {
+    @apply h-full relative;
+}
+
+.back-icon {
+    @apply text-3xl text-white absolute left-28;
+}
+
+.card-big {
+    @apply w-2/3 mx-auto h-[90%] max-w-[800px] mt-8 rounded-3xl flex border-2 border-white overflow-hidden;
+}
+
+.card-big figure {
+    @apply w-1/2 h-full;
+}
+
+.card-big figure img {
+    @apply h-full object-cover;
+}
+
+.card-big-right {
+    @apply w-1/2 h-full p-8 flex flex-col justify-between;
+}
+
+.picture-icons {
+    @apply text-white flex items-center gap-3 text-2xl mb-10 justify-end;
+}
+
+.user-info {
+    @apply flex items-center gap-3;
+}
+
+.add-comment input {
+    @apply border-2 border-gray-200 w-full px-4 py-2 rounded-full text-white !important;
+}

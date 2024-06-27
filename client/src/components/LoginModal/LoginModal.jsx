@@ -1,0 +1,108 @@
+import { Dialog, DialogTitle } from "@mui/material";
+import logo from '../../assets/img/logo.png'
+import { useRef, useState } from "react";
+import { HiOutlineLockClosed as PassIcon, HiOutlineUser as UserIcon } from "react-icons/hi";
+import { AiOutlineClose as CloseIcon } from "react-icons/ai";
+
+export default function ({ open, setOpen }) {
+    const emptyLoginErrors = {
+        username: [],
+        password: []
+    }
+
+    const formRef = useRef(null);
+    const [loginErrors, setLoginErrors] = useState(emptyLoginErrors);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(formRef.current);
+
+        const username = formData.get('username');
+        const password = formData.get('password');
+
+        console.log('Username:', username);
+        console.log('Password:', password);
+
+    }
+
+
+    return (
+        <Dialog
+            open={open}
+            onClose={() => setOpen(false)}
+            PaperProps={{
+                sx: { borderRadius: 10 }
+            }}
+        >
+            <div className="dialog-container flex items-center p-12 flex-col  text-gray-900 gap-4 relative">
+                <CloseIcon
+                    className="absolute top-8 right-8 text-2xl"
+                    onClick={() => setOpen(false)}
+                />
+
+                <img
+                    src={logo}
+                    alt="logo"
+                    className="w-[35px]"
+                />
+                <DialogTitle>Welcome on MuseVerse</DialogTitle>
+                <form
+                    className="register flex flex-col"
+                    ref={formRef}
+                    onSubmit={handleSubmit}
+                >
+
+
+                    <div className="input bg-input flex gap-3 items-center ps-4 rounded-md py-3 pe-3">
+                        <UserIcon
+                            className='text-xl no-hover-icon'
+                        />
+                        <input type="text"
+                            className="bg-transparent w-full  border-transparent focus:border-transparent focus:ring-0"
+                            placeholder="Your Username"
+                            name='username'
+
+                        />
+                    </div>
+                    {
+                        loginErrors.username.length !== 0 && <div className="error-message text-red-500">
+                            {loginErrors.username[0]}
+                        </div>
+                    }
+
+                    <div className="input bg-input flex gap-3 items-center ps-4 rounded-md py-3 pe-3">
+                        <PassIcon
+                            className='text-xl no-hover-icon'
+                        />
+                        <input type="password"
+                            className="bg-transparent w-full border-transparent focus:border-transparent focus:ring-0"
+                            name='password'
+                            placeholder="Your Password" />
+                    </div>
+                    {
+                        loginErrors.password.length !== 0 && <div className="error-message text-red-500">
+                            {loginErrors.password[0]}
+                        </div>
+                    }
+                    <button
+                        className="bg-theme hover:bg-themeDarker text-white text-lg font-bold py-2 px-4 rounded-full transition duration-300 mt-3"
+                    >
+                        Log In
+                    </button >
+                    {/* <button
+                    className="bg-input hover:bg-gray-900 text-gray-400 border-0 border-gray-400 text-lg font-bold py-2 px-4 rounded-xl transition duration-300"
+                >
+                    Forgot your password ?
+                </button > */}
+
+
+                    {/* <p className="font-semibold mt-3 cursor-pointer ms-3" >
+                        Don't have an account yet?
+                    </p > */}
+
+                </form >
+            </div>
+
+        </Dialog>
+    )
+}

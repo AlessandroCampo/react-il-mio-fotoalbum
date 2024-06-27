@@ -108,7 +108,21 @@ const show = async (req, res, next) => {
 
     try {
         const picture = await prisma.picture.findUniqueOrThrow({
-            where: { slug: slug }
+            where: { slug: slug },
+            include: {
+                User: {
+                    include: {
+                        followedBy: {
+                            select: {
+                                _count: true
+                            }
+                        }
+                    }
+                },
+                likes: true,
+                saves: true,
+                views: true
+            }
         })
         res.json(picture);
     } catch (err) {
