@@ -7,6 +7,7 @@ const { signup, login, getInfo } = require('../controllers/userController.js');
 const validator = require('../middlewares/validator.js');
 const auth = require('../middlewares/auth.js');
 const { registrationSchema, loginSchema } = require('../validations/userValidations.js');
+const uploadFile = require('../middlewares/uploadFile.js');
 
 
 
@@ -14,7 +15,8 @@ const { registrationSchema, loginSchema } = require('../validations/userValidati
 
 
 
-router.post('/signup', validator(registrationSchema), signup);
+
+router.post('/signup', uploadFile, validator(registrationSchema), signup);
 router.post('/login', validator(loginSchema), login);
 router.get('/:username', auth, getInfo);
 

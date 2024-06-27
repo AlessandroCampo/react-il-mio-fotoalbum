@@ -1,43 +1,62 @@
 import { Dialog, DialogTitle } from "@mui/material";
 import logo from '../../assets/img/logo.png'
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiOutlineLockClosed as PassIcon, HiOutlineUser as UserIcon } from "react-icons/hi";
 import { AiOutlineClose as CloseIcon } from "react-icons/ai";
+import { useAuth } from "../../contexts/authContext";
 
 export default function ({ open, setOpen }) {
-    const emptyLoginErrors = {
-        username: [],
-        password: []
-    }
+    // const emptyLoginErrors = {
+    //     username: [],
+    //     password: []
+    // }
+
+    const { login, isLoggedIn } = useAuth();
 
     const formRef = useRef(null);
-    const [loginErrors, setLoginErrors] = useState(emptyLoginErrors);
+    const [loginError, setLoginError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(formRef.current);
 
         const username = formData.get('username');
         const password = formData.get('password');
-
-        console.log('Username:', username);
-        console.log('Password:', password);
+        try {
+            await login({ username, password });
+        } catch (err) {
+            const errorMessage = err?.response?.data?.error?.message;
+            setLoginError(errorMessage);
+        }
 
     }
+
+    const handleClose = () => {
+        setLoginError('');
+        setOpen(false)
+    }
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            handleClose();
+        }
+    }, [isLoggedIn]);
 
 
     return (
         <Dialog
             open={open}
-            onClose={() => setOpen(false)}
+            onClose={handleClose}
             PaperProps={{
-                sx: { borderRadius: 10 }
+                sx: { borderRadius: 10, width: 360 },
+
+
             }}
         >
-            <div className="dialog-container flex items-center p-12 flex-col  text-gray-900 gap-4 relative">
+            <div className="dialog-container flex items-center p-10 flex-col  text-gray-900 gap-4 relative">
                 <CloseIcon
                     className="absolute top-8 right-8 text-2xl"
-                    onClick={() => setOpen(false)}
+                    onClick={handleClose}
                 />
 
                 <img
@@ -45,9 +64,9 @@ export default function ({ open, setOpen }) {
                     alt="logo"
                     className="w-[35px]"
                 />
-                <DialogTitle>Welcome on MuseVerse</DialogTitle>
+                <DialogTitle>Welcome on Museverse</DialogTitle>
                 <form
-                    className="register flex flex-col"
+                    className="register flex flex-col max-w-full"
                     ref={formRef}
                     onSubmit={handleSubmit}
                 >
@@ -64,12 +83,6 @@ export default function ({ open, setOpen }) {
 
                         />
                     </div>
-                    {
-                        loginErrors.username.length !== 0 && <div className="error-message text-red-500">
-                            {loginErrors.username[0]}
-                        </div>
-                    }
-
                     <div className="input bg-input flex gap-3 items-center ps-4 rounded-md py-3 pe-3">
                         <PassIcon
                             className='text-xl no-hover-icon'
@@ -80,8 +93,8 @@ export default function ({ open, setOpen }) {
                             placeholder="Your Password" />
                     </div>
                     {
-                        loginErrors.password.length !== 0 && <div className="error-message text-red-500">
-                            {loginErrors.password[0]}
+                        loginError && <div className="error-message text-theme max-w-full my-4">
+                            {loginError}
                         </div>
                     }
                     <button

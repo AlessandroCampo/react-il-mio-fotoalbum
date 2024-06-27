@@ -1,16 +1,26 @@
-import Card from "../components/Card"
+import Card from "../components/Card/Card.jsx"
 import axiosInstance from '../axiosClient.js';
-import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar/Navbar.jsx";
+import { useEffect, useRef, useState } from "react";
+import './viewsStyles/generalViewsStyles.css'
+
 
 export default function () {
 
     const [pictureList, setPictureList] = useState([]);
+    const [lastPage, setLastPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(2);
+    const cardsContainer = useRef(null);
 
-    const fetchPictures = async () => {
+    const fetchPictures = async (page = 1) => {
         try {
-            const { data } = await axiosInstance.get('/pictures');
-            setPictureList(data.pictures);
+            const { data } = await axiosInstance.get(`pictures?page=${page}`)
+            setTotalPages(data.totalPages);
+
+            setPictureList(oldList => {
+                const oldPictureIds = new Set(oldList.map(picture => picture.id));
+                const newUniquePictures = data.pictures.filter(picture => !oldPictureIds.has(picture.id));
+                return [...oldList, ...newUniquePictures];
+            });
         } catch (err) {
             console.error(err);
         }
@@ -21,11 +31,41 @@ export default function () {
         fetchPictures();
     }, []);
 
+    useEffect(() => {
+        const handleScroll = async () => {
+            if (cardsContainer.current) {
+                const scrollTop = document.documentElement.scrollTop;
+                const windowHeight = window.innerHeight;
+                const containerHeight = cardsContainer.current.offsetHeight;
+                const containerTop = cardsContainer.current.offsetTop;
+                const bottomOfViewport = scrollTop + windowHeight;
+                const triggerPoint = containerTop + containerHeight * 0.9;
+
+                if (bottomOfViewport >= triggerPoint) {
+                    setLastPage(prevPage => {
+                        const nextPage = prevPage + 1;
+                        fetchPictures(nextPage);
+                        return nextPage;
+                    })
+                    return
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [pictureList]);
+
 
     return (
         <div className="home-container">
 
-            <div className="cards-container mt-36 w-2/3 mx-auto flex gap-4 flex-wrap">
+            <div className="cards-container"
+                ref={cardsContainer}
+            >
                 {
                     pictureList.map(pic => (
                         <Card

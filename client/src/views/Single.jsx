@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Avatar } from "@mui/material";
 import { IoBookmarkOutline as BookmarkIconOutline, IoBookmark as BookmarkIcon, IoHeart as HeartIcon, IoHeartOutline as HeartIconOutline, IoSave as DownloadIcon, IoSaveOutline as DownloadIconOutline } from "react-icons/io5";
 import { FaArrowLeft as ArrowLeftIcon } from "react-icons/fa";
-import './viewsStyles/SingleStyles.css';
+import './viewsStyles/singleStyles.css';
 
 export default function () {
 

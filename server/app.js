@@ -14,6 +14,7 @@ const globalErrorHandler = require('./middlewares/globalErrorHandler.js');
 //router imports
 const userRouter = require('./routers/userRouter.js');
 const pictureRouter = require('./routers/pictureRouter.js');
+const { getCategories } = require('./controllers/pictureController.js');
 
 
 
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/users', userRouter);
 app.use('/pictures', pictureRouter);
 
+app.get('/categories', getCategories)
 
 app.get('/', (req, res) => {
     res.send('Hello world')

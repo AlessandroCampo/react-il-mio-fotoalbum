@@ -10,7 +10,8 @@ img {
   @apply max-w-full
 }
 
-input, textarea {
+input,
+textarea {
   @apply bg-transparent resize-none focus:ring-0 outline-none focus:bg-transparent
 }
 

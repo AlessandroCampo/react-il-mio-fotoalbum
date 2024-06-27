@@ -8,14 +8,14 @@ const prisma = new PrismaClient();
 
 const signup = async (req, res, next) => {
 
-    const { username, password, email, avatar, bio } = req.body;
+    const { username, password, email, image, bio } = req.body;
 
     try {
         const data = {
             username,
             password: await hashPassword(password),
             email,
-            avatar,
+            avatar: image,
             bio
         }
 

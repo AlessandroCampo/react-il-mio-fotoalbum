@@ -7,6 +7,7 @@ import { GlobalProvider } from "./contexts/globalContext";
 import Home from "./views/Home";
 import MainLayout from "./layouts/MainLayout";
 import Single from "./views/Single";
+import { AuthProvider } from "./contexts/authContext";
 
 
 const router = createBrowserRouter([
@@ -14,9 +15,10 @@ const router = createBrowserRouter([
         path: '/',
         element: (
             <GlobalProvider>
-                <MainLayout>
-
-                </MainLayout>
+                <AuthProvider>
+                    <MainLayout>
+                    </MainLayout>
+                </AuthProvider>
             </GlobalProvider>
         ),
         children: [

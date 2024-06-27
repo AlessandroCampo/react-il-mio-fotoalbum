@@ -1,0 +1,15 @@
+.card-wrapper {
+    @apply h-[420px] w-[236px] relative cursor-pointer;
+}
+
+.card-wrapper img {
+    @apply rounded-3xl h-full w-full object-cover;
+}
+
+.overlay {
+    @apply h-full w-full bg-black bg-opacity-50 absolute z-10 top-0 left-0 hidden flex-col justify-between items-end p-4 group-hover:flex;
+}
+
+.overlay-icons {
+    @apply text-white text-3xl flex gap-2;
+}

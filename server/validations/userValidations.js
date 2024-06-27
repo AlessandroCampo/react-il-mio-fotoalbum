@@ -53,7 +53,7 @@ const registrationSchema = Joi.object({
         .required()
         .external(isEmailTaken),
 
-    avatar: Joi.string()
+    image: Joi.string()
         .uri({ scheme: ['http', 'https'] })
         .allow(null, '').
         optional(),
@@ -120,7 +120,7 @@ const loginSchema = Joi.object({
 
         return { ...credentials, user };
     } catch (error) {
-        throw helpers.error('any.custom', { message: 'Invalid credentials' });
+        throw new CustomError(error.title, error.message, error.status);
     }
 });
 

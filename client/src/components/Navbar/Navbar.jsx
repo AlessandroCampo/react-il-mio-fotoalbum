@@ -1,36 +1,61 @@
 import {
-    IoHome,
     IoHomeOutline,
-    IoCompass,
     IoCompassOutline,
     IoSearch,
     IoNotifications,
-    IoText
-
+    IoLogOut,
+    IoSettings
 } from "react-icons/io5";
 
-import { BiSolidLogInCircle } from "react-icons/bi";
+import { RiUserFill } from "react-icons/ri";
+
 
 import { BiSolidMessageRoundedDots as MessageIcon } from "react-icons/bi";
-
 import { Avatar } from "@mui/material";
 import logo from '../../assets/img/logo.png';
 import './NavbarStyles.css';
 import { useState } from "react";
-import LoginModal from "../LoginModal/LoginModal";
+import { useAuth } from "../../contexts/authContext";
+import Dropdown from "../Dropdown";
 
-export default function Navbar() {
+
+export default function Navbar({ openLoginModal }) {
+
+
 
     const [searchValue, setSearchValue] = useState('');
-    const [loginModalOpen, setloginModalOpen] = useState(false);
+    const { isLoggedIn, user, logout } = useAuth();
+
+
+    const userDropdownOptions = [
+        {
+            label: 'Profile',
+            icon: <RiUserFill
+                className="no-hover-icon"
+            />,
+            cb: () => { }
+        },
+        {
+            label: 'Settings',
+            icon: <IoLogOut
+                className="no-hover-icon"
+
+            />,
+            cb: () => { }
+        },
+        {
+            label: 'Logout',
+            icon: <IoSettings
+                className="no-hover-icon"
+
+            />,
+            cb: () => { logout() }
+        },
+    ]
 
 
     return (
         <menu className="px-6 py-4 mt-2">
-            <LoginModal
-                open={loginModalOpen}
-                setOpen={setloginModalOpen}
-            />
             <div className="navbar-left">
                 <figure className="max-w-[30px]">
                     <img
@@ -54,15 +79,20 @@ export default function Navbar() {
                 <IoNotifications />
                 <MessageIcon />
                 {
-                    1 === 1 ?
-                        <BiSolidLogInCircle
-                            onClick={() => { setloginModalOpen(true) }}
+                    isLoggedIn === false ?
+                        <RiUserFill
+                            onClick={openLoginModal}
                         /> :
-                        <Avatar
-                            alt="user"
-                            src="mskdmaksfm.jpg"
-                            sx={{ bgcolor: '#FFCC70', width: 30, height: 30 }}
+                        <Dropdown
+                            button={<Avatar
+                                alt={user.username}
+                                src={user.avatar}
+                                sx={{ bgcolor: '#FFCC70', width: 30, height: 30 }}
+                                className="cursor-pointer hover:scale-110"
+                            />}
+                            options={userDropdownOptions}
                         />
+
                 }
             </div>
         </menu>
