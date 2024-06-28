@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 router.use(express.static('public'));
 //controllers imports
-const { index, create, show, destroy, update, hideOrShow } = require('../controllers/pictureController.js');
+const { index, create, show, destroy, update, hideOrShow, like } = require('../controllers/pictureController.js');
 
 //middlewares imports
 const handleFileUplaod = require('../middlewares/uploadFile.js');
@@ -16,6 +16,7 @@ router.get('/', index);
 router.post('/', handleFileUplaod, auth, validator(pictureCreateSchema), create);
 router.get('/:slug', show);
 router.delete('/:slug', auth, isUserPicture, destroy);
+router.post('/:slug/like', auth, like)
 router.patch(':/slug/change-visibility', isUserPicture, auth, hideOrShow);
 router.patch(':/slug', isUserPicture, auth, update);
 

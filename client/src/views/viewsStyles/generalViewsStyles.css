@@ -1,3 +1,7 @@
 .cards-container {
     @apply mt-36 w-2/3 mx-auto flex gap-4 flex-wrap;
 }
+
+.home-container {
+    @apply h-full overflow-y-scroll;
+}

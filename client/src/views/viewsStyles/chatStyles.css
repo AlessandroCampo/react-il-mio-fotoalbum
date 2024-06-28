@@ -1,0 +1,11 @@
+.message {
+    @apply px-4 py-2 rounded-3xl text-white max-w-full break-words;
+}
+
+.message.sent {
+    @apply bg-theme ms-auto;
+}
+
+.message.received {
+    @apply me-auto bg-[#e0e0e0] text-black;
+}

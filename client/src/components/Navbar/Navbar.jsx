@@ -17,6 +17,7 @@ import './NavbarStyles.css';
 import { useState } from "react";
 import { useAuth } from "../../contexts/authContext";
 import Dropdown from "../Dropdown";
+import { useNavigate } from "react-router";
 
 
 export default function Navbar({ openLoginModal }) {
@@ -25,7 +26,7 @@ export default function Navbar({ openLoginModal }) {
 
     const [searchValue, setSearchValue] = useState('');
     const { isLoggedIn, user, logout } = useAuth();
-
+    const navigate = useNavigate();
 
     const userDropdownOptions = [
         {
@@ -33,15 +34,7 @@ export default function Navbar({ openLoginModal }) {
             icon: <RiUserFill
                 className="no-hover-icon"
             />,
-            cb: () => { }
-        },
-        {
-            label: 'Settings',
-            icon: <IoLogOut
-                className="no-hover-icon"
-
-            />,
-            cb: () => { }
+            cb: () => { navigate(`${user.username}`) }
         },
         {
             label: 'Logout',
@@ -53,17 +46,26 @@ export default function Navbar({ openLoginModal }) {
         },
     ]
 
+    const returnToHome = () => {
+        navigate('/');
+    }
+
 
     return (
-        <menu className="px-6 py-4 mt-2">
+        <menu className="px-6 py-4 mt-2 fixed w-full">
             <div className="navbar-left">
-                <figure className="max-w-[30px]">
+                <figure
+                    className="max-w-[30px] cursor-pointer"
+                    onClick={returnToHome}
+                >
                     <img
                         src={logo}
                         alt="logo"
                     />
                 </figure>
-                <IoHomeOutline />
+                <IoHomeOutline
+                    onClick={returnToHome}
+                />
                 <IoCompassOutline />
             </div>
             <div className="searchbar">
@@ -77,7 +79,9 @@ export default function Navbar({ openLoginModal }) {
             </div>
             <div className="navbar-right">
                 <IoNotifications />
-                <MessageIcon />
+                <MessageIcon
+                    onClick={() => { navigate(`/${user.username}/chat`) }}
+                />
                 {
                     isLoggedIn === false ?
                         <RiUserFill

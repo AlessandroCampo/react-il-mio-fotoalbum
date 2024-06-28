@@ -25,7 +25,7 @@ export default function ({ open, setOpen }) {
     const [selectedCategories, setSelectedCategories] = useState([]);
 
     const handleSelectChange = (selectedOptions) => {
-        console.log(selectedOptions)
+
         setSelectedCategories(selectedOptions);
     };
 

@@ -7,7 +7,7 @@
 }
 
 .overlay {
-    @apply h-full w-full bg-black bg-opacity-50 absolute z-10 top-0 left-0 hidden flex-col justify-between items-end p-4 group-hover:flex;
+    @apply h-full w-full bg-black bg-opacity-50 absolute z-10 top-0 left-0 hidden flex-col justify-between items-end p-4 group-hover:flex rounded-3xl;
 }
 
 .overlay-icons {

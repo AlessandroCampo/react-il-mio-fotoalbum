@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import customAxiosInstance from "../axiosClient";
 import { useGlobal } from "./globalContext";
+import { socket } from "../socket";
 
 
 const AuthContext = createContext();
@@ -13,8 +14,9 @@ const AuthProvider = ({ children }) => {
     const fetchLoggedUserData = async (username) => {
         try {
             const userData = await getUserInfo(username);
-            console.log(userData);
+
             setUser(userData);
+            socket.emit('authenticated', userData.id);
         } catch (err) {
             console.error(err);
         }

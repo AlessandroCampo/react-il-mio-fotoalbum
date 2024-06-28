@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const createUniqueSlug = require("../utils/createUniqueSlug");
+const { userSocketMap } = require("../socket");
 
 
 const prisma = new PrismaClient();
@@ -174,4 +175,56 @@ const getCategories = async (req, res, next) => {
     }
 }
 
-module.exports = { index, create, show, destroy, update, hideOrShow, getCategories }
+const like = async (req, res, next) => {
+    const { slug } = req.params;
+    const { userId, pictureId, authorId } = req.body;
+    console.log(authorId)
+    try {
+        const data = {
+            userId, pictureId
+
+        }
+        const like = await prisma.like.create({
+            data,
+            include: {
+                User: true
+            }
+        });
+
+        const recipientSocketId = userSocketMap.get(authorId);
+        req.io.to(recipientSocketId).emit('newLike', like);
+
+        res.json({ like })
+    } catch (err) {
+        next(err);
+    }
+
+
+
+}
+
+// const removeLike = async (req, res, next) => {
+//     const { slug } = req.params;
+//     const { likeId } = req.body;
+//     try {
+//         if (!likeId) {
+//             throw new CustomError('Like not found', `You have not liked the post with slug ${slug}`, 404);
+//         }
+//         const removedLike = await prisma.like.delete({
+//             where: {
+//                 id: likeId
+//             }
+//         });
+//         res.json({
+//             message: `Your like has been removed from the post  with slug ${slug}`,
+//             removedLike,
+//         })
+//     } catch (err) {
+//         const customError = prismaErorrHandler(err);
+//         next(customError);
+//     }
+
+
+// }
+
+module.exports = { index, create, show, destroy, update, hideOrShow, getCategories, like }

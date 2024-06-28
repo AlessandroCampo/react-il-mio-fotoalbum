@@ -8,6 +8,10 @@ import Home from "./views/Home";
 import MainLayout from "./layouts/MainLayout";
 import Single from "./views/Single";
 import { AuthProvider } from "./contexts/authContext";
+import User from "./views/User";
+import Chat from "./views/Chat";
+
+
 
 
 const router = createBrowserRouter([
@@ -27,6 +31,14 @@ const router = createBrowserRouter([
                 element: <Home />
             },
             {
+                path: '/:username',
+                element: <User />
+            },
+            {
+                path: '/:username/chat',
+                element: <Chat />
+            },
+            {
                 path: '/pin/:slug',
                 element: <Single />
             },
@@ -44,6 +56,7 @@ const router = createBrowserRouter([
 
 
 const app = function () {
+
     return (
         <RouterProvider
             router={router}

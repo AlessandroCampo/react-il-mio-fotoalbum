@@ -30,41 +30,44 @@ export default function () {
     useEffect(() => {
         fetchPictures();
     }, []);
-
     useEffect(() => {
         const handleScroll = async () => {
             if (cardsContainer.current) {
-                const scrollTop = document.documentElement.scrollTop;
-                const windowHeight = window.innerHeight;
-                const containerHeight = cardsContainer.current.offsetHeight;
-                const containerTop = cardsContainer.current.offsetTop;
-                const bottomOfViewport = scrollTop + windowHeight;
-                const triggerPoint = containerTop + containerHeight * 0.9;
+                const { scrollTop, scrollHeight, clientHeight } = cardsContainer.current;
+
+                const bottomOfViewport = scrollTop + clientHeight;
+                const triggerPoint = scrollHeight * 0.9;
 
                 if (bottomOfViewport >= triggerPoint) {
+                    console.log('triggered')
                     setLastPage(prevPage => {
                         const nextPage = prevPage + 1;
+                        if (nextPage > totalPages) {
+                            return lastPage;
+                        }
                         fetchPictures(nextPage);
                         return nextPage;
-                    })
-                    return
+                    });
                 }
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        const container = cardsContainer.current;
+        container.addEventListener('scroll', handleScroll);
 
         return () => {
-            window.removeEventListener('scroll', handleScroll);
+            container.removeEventListener('scroll', handleScroll);
         };
-    }, [pictureList]);
+    }, [pictureList, totalPages, lastPage]);
 
 
     return (
-        <div className="home-container">
+        <div className="home-container"
+
+            ref={cardsContainer}
+        >
 
             <div className="cards-container"
-                ref={cardsContainer}
             >
                 {
                     pictureList.map(pic => (
