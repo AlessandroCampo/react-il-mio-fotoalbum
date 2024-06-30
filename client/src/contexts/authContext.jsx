@@ -8,14 +8,17 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(undefined);
+    const [loadingAuth, setLoadingAuth] = useState(true);
     const isLoggedIn = Boolean(user);
     const { getUserInfo } = useGlobal();
+    const authId = user?.id || undefined;
 
     const fetchLoggedUserData = async (username) => {
         try {
             const userData = await getUserInfo(username);
 
             setUser(userData);
+            setLoadingAuth(false);
             socket.emit('authenticated', userData.id);
         } catch (err) {
             console.error(err);
@@ -28,7 +31,10 @@ const AuthProvider = ({ children }) => {
 
         if (authToken && museUsername) {
             fetchLoggedUserData(museUsername);
+            return
         }
+
+        setLoadingAuth(false);
     }, [])
 
 
@@ -53,8 +59,10 @@ const AuthProvider = ({ children }) => {
                 {
                     user,
                     isLoggedIn,
+                    authId,
                     login,
-                    logout
+                    logout,
+                    loadingAuth
                 }
             }
         >

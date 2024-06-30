@@ -5,12 +5,23 @@ import { useNavigate } from 'react-router';
 import './CardStyles.css';
 import { handleDownload } from "../../utils";
 import { useGlobal } from "../../contexts/globalContext";
+import { useAuth } from "../../contexts/authContext";
+import { IoTrashBin as DeleteIcon, IoEye as VisibleIcon, IoEyeOff as HiddenIcon } from "react-icons/io5";
+import { useEffect, useState } from "react";
 
 
 export default function ({ picture }) {
-    const { image, slug, id } = picture;
+    const { image, slug, id, userId, isVisibile } = picture;
     const navigate = useNavigate();
-    const { likePicture } = useGlobal();
+    const { likePicture, setEditModalOpen, setToEditPicture, setToDeletePicture, setDeleteModalOpen, changeVisibility, notify } = useGlobal();
+    const { authId } = useAuth();
+    const isUserPic = authId === userId;
+    const [isVisible, setIsVisible] = useState(picture.isVisibile);
+
+    useEffect(() => {
+
+    }, [isVisibile])
+
 
     const downloadImage = (e) => {
         e.stopPropagation();
@@ -26,6 +37,32 @@ export default function ({ picture }) {
         }
     }
 
+    const openEditModal = (e) => {
+        e.stopPropagation();
+        setToEditPicture(picture);
+        setEditModalOpen(true);
+    }
+
+    const openDeleteMode = (e) => {
+        e.stopPropagation();
+        setToDeletePicture(picture)
+        setDeleteModalOpen(true)
+    }
+
+
+    const hideOrShow = async (e) => {
+        e.stopPropagation();
+        try {
+            await changeVisibility(!picture.isVisibile, picture.slug)
+            notify(`Your picture has succesfully been ${picture.isVisibile ? 'published' : 'hidden'}`);
+            setIsVisible(oldVal => !oldVal)
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+
     return (
         <figure
             className="card-wrapper group"
@@ -37,17 +74,43 @@ export default function ({ picture }) {
                 alt={slug}
             />
             <div className="overlay">
-                <button className='button-theme'>
-                    Save
-                </button>
-                <div className="overlay-icons ">
-                    <HeartIcon
-                        onClick={sendLike}
-                    />
-                    <DownloadIcon
-                        onClick={downloadImage}
-                    />
-                </div>
+                {
+                    isUserPic ?
+                        <button
+                            className='button-theme'
+                            onClick={openEditModal}
+                        >
+                            Edit
+                        </button> :
+                        <button className='button-theme'>
+                            Save
+                        </button>
+                }
+
+                {
+                    !isUserPic ? <div className="overlay-icons ">
+                        <HeartIcon
+                            onClick={sendLike}
+                        />
+                        <DownloadIcon
+                            onClick={downloadImage}
+                        />
+                    </div> : <div className="overlay-icons ">
+                        <DeleteIcon
+                            onClick={openDeleteMode}
+                        />
+                        {
+                            isVisible ?
+                                <HiddenIcon
+                                    onClick={hideOrShow} /> :
+                                <VisibleIcon
+                                    onClick={hideOrShow} />
+
+                        }
+
+                    </div>
+                }
+
             </div>
         </figure>
     )

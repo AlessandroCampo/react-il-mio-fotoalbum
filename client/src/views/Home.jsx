@@ -2,6 +2,7 @@ import Card from "../components/Card/Card.jsx"
 import axiosInstance from '../axiosClient.js';
 import { useEffect, useRef, useState } from "react";
 import './viewsStyles/generalViewsStyles.css'
+import { useAuth } from "../contexts/authContext.jsx";
 
 
 export default function () {
@@ -9,11 +10,14 @@ export default function () {
     const [pictureList, setPictureList] = useState([]);
     const [lastPage, setLastPage] = useState(1);
     const [totalPages, setTotalPages] = useState(2);
+    const { isLoggedIn, loadingAuth } = useAuth();
     const cardsContainer = useRef(null);
 
     const fetchPictures = async (page = 1) => {
+        if (loadingAuth) return
         try {
-            const { data } = await axiosInstance.get(`pictures?page=${page}`)
+            const { data } = isLoggedIn ? await axiosInstance.get(`pictures/get-feed?page=${page}`) : await axiosInstance.get(`pictures?page=${page}`)
+            console.log(isLoggedIn, data)
             setTotalPages(data.totalPages);
 
             setPictureList(oldList => {
@@ -29,7 +33,7 @@ export default function () {
 
     useEffect(() => {
         fetchPictures();
-    }, []);
+    }, [isLoggedIn, loadingAuth]);
     useEffect(() => {
         const handleScroll = async () => {
             if (cardsContainer.current) {
@@ -71,7 +75,7 @@ export default function () {
             >
                 {
                     pictureList.map(pic => (
-                        <Card
+                        pic.isVisibile && <Card
                             picture={pic}
                             key={`card-${pic.id}`}
                         />

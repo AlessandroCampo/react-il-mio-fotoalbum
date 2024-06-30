@@ -6,11 +6,12 @@ import Card from "../components/Card/Card";
 
 export default function () {
 
-    const { getUserInfo } = useGlobal();
+    const { getUserInfo, userPictures, setUserPictures } = useGlobal();
     const [user, setUser] = useState(undefined);
     const [searchString, setSearchString] = useState('');
     const { username } = useParams();
     const navigate = useNavigate();
+
 
     const fetchUserData = async () => {
         const pageUser = await getUserInfo(username);
@@ -19,11 +20,13 @@ export default function () {
             navigate('/');
         }
         setUser(pageUser);
+        setUserPictures(pageUser.pictures);
     }
 
     useEffect(() => {
         fetchUserData();
     }, [username])
+
 
 
 
@@ -100,7 +103,7 @@ export default function () {
                 <div className="pictures-container  flex flex-wrap w-2/3 gap-4 justify-center">
 
                     {
-                        user.pictures.map(pic => (
+                        userPictures.map(pic => (
                             (!searchString || pic.title.includes(searchString)) && <Card
                                 picture={pic}
                                 key={`user-picture-${pic.id}`}

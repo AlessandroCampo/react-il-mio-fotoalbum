@@ -7,6 +7,7 @@ import { useGlobal } from "../../contexts/globalContext";
 import { FaCircleArrowUp as ArrowUpIcon } from "react-icons/fa6";
 import customAxiosInstance from "../../axiosClient";
 import { BeatLoader } from "react-spinners";
+import { useNavigate } from "react-router";
 
 
 
@@ -20,6 +21,7 @@ export default function ({ open, setOpen }) {
     const options = categories?.map(c => {
         return { value: c.id, label: c.name }
     })
+    const navgiate = useNavigate();
 
 
     const [selectedCategories, setSelectedCategories] = useState([]);
@@ -40,9 +42,11 @@ export default function ({ open, setOpen }) {
 
         try {
             const { data } = await customAxiosInstance.post(`pictures`, formData);
-            // notify(`Picture ${data.post} has been succesfully posted`, 'success');
+            console.log(data);
+            notify(`Picture ${data.picture.title} has been succesfully posted`, 'success');
             setLoading(false);
             setOpen(false);
+            navgiate(`/pin/${data.picture.slug}`);
 
         } catch (err) {
             console.error(err);
@@ -65,12 +69,6 @@ export default function ({ open, setOpen }) {
             reader.readAsDataURL(file);
         }
     }
-
-    // useEffect(() => {
-    //     if (isLoggedIn) {
-    //         handleClose();
-    //     }
-    // }, [isLoggedIn]);
 
 
     return (

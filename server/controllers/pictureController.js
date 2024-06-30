@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const createUniqueSlug = require("../utils/createUniqueSlug");
 const { userSocketMap } = require("../socket");
+const { connect } = require("../routers/pictureRouter");
 
 
 const prisma = new PrismaClient();
@@ -9,7 +10,6 @@ const prisma = new PrismaClient();
 
 
 const index = async (req, res, next) => {
-
     const where = {
         isVisibile: true
     };
@@ -48,6 +48,65 @@ const index = async (req, res, next) => {
                         }
                     }
                 },
+                categories: true,
+                likes: true
+            },
+            where
+        });
+        return res.json({
+            message: `${pictures.length} ${pictures.length > 1 ? 'pictures' : 'picture'} have been found on page number ${page}`,
+            pictures,
+            currentPage: page,
+            totalPages
+        })
+    } catch (err) {
+
+        next(err);
+    }
+};
+
+const getPersonalizedFeed = async (req, res, next) => {
+
+    const where = {
+        isVisibile: true,
+        userId: { not: req.user.id }
+    };
+    const { page = 1, limit = 10, containedString } = req.query;
+    if (containedString) where.title = { contains: containedString };
+
+
+
+
+    const offset = (page - 1) * limit;
+    const totalPosts = await prisma.picture.count({ where });
+    const totalPages = Math.ceil(totalPosts / limit);
+
+    try {
+
+        const pictures = await prisma.picture.findMany({
+            take: Number(limit),
+            skip: offset,
+            orderBy: {
+                createdAt: 'desc'
+            },
+            include: {
+                User: {
+                    select: {
+                        username: true,
+                        avatar: true
+                    }
+                },
+                comments: {
+                    include: {
+                        User: {
+                            select: {
+                                username: true,
+                                avatar: true
+                            }
+                        }
+                    }
+                },
+                categories: true,
                 likes: true
             },
             where
@@ -120,6 +179,7 @@ const show = async (req, res, next) => {
                         }
                     }
                 },
+                categories: true,
                 likes: true,
                 saves: true,
                 views: true
@@ -148,6 +208,28 @@ const destroy = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
+        const { title, description, categories, userId } = req.body;
+        console.log(req.body)
+        const { slug } = req.params;
+
+        const formattedCategories = categories.map(c => ({ id: Number(c) }));
+        const data = {
+            title,
+            description,
+            categories: {
+                set: formattedCategories
+            }
+        };
+
+
+        const picture = await prisma.picture.update({
+            where: { slug },
+            data
+        })
+
+        res.json(picture);
+
+
 
     } catch (err) {
         next(err)
@@ -156,7 +238,15 @@ const update = async (req, res, next) => {
 
 const hideOrShow = async (req, res, next) => {
     try {
-
+        const { isVisibile } = req.body;
+        const { slug } = req.params;
+        const picture = await prisma.picture.update({
+            where: { slug },
+            data: {
+                isVisibile
+            }
+        })
+        res.json(picture);
     } catch (err) {
         next(err)
     }
@@ -227,4 +317,4 @@ const like = async (req, res, next) => {
 
 // }
 
-module.exports = { index, create, show, destroy, update, hideOrShow, getCategories, like }
+module.exports = { index, create, show, destroy, update, hideOrShow, getCategories, like, getPersonalizedFeed }

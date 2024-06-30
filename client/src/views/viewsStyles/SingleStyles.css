@@ -33,3 +33,11 @@
 .add-comment input {
     @apply border-2 border-gray-200 w-full px-4 py-2 rounded-full text-white !important;
 }
+
+.pic-text {
+    @apply flex flex-col gap-4;
+}
+
+.pic-title {
+    @apply font-bold text-white text-2xl
+}

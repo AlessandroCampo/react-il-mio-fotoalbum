@@ -13,9 +13,14 @@ const GlobalContext = createContext();
 function GlobalProvider({ children }) {
     // Aggiungiamo le varibili di stato che vogliamo condividere
     const [store, setStore] = useState({});
+    const [toEditPicture, setToEditPicture] = useState(undefined);
+    const [toDeletePicture, setToDeletePicture] = useState(undefined);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [categories, setCategories] = useState([]);
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [conversations, setConversations] = useState([]);
+    const [userPictures, setUserPictures] = useState([]);
     const navigate = useNavigate();
 
     const notify = (message, type) => {
@@ -47,11 +52,37 @@ function GlobalProvider({ children }) {
         return data.like;
     };
 
+    const deletePicture = async (slug) => {
+        try {
+            const { data } = await axiosClient.delete(`/pictures/${slug}`);
+            const username = localStorage.getItem('museUsername')
+            setToDeletePicture(undefined);
+            setDeleteModalOpen(false);
+            setUserPictures(oldPics => oldPics.filter(p => p.id !== toDeletePicture.id));
+            navigate(`/${username}`);
+            notify('Your picture has been succesfully deleted', 'success');
+
+        }
+        catch (err) {
+            console.error(err);
+            notify('There was an error deleting your picture', 'error')
+        }
+
+    };
+
     const getUserConversations = async () => {
         const { data } = await axiosClient.get(`/messages`);
         const username = localStorage.getItem('museUsername')
         setConversations(groupMessagesByConversations(data, username));
     }
+
+    const changeVisibility = async (boolean, slug) => {
+        const newValue = {
+            isVisibile: boolean
+        }
+        const { data } = await axiosClient.patch(`/pictures/${slug}/change-visibility`, newValue);
+        console.log(data);
+    };
 
 
     const getCategories = async () => {
@@ -142,7 +173,19 @@ function GlobalProvider({ children }) {
                 notify,
                 conversations,
                 setConversations,
-                likePicture
+                likePicture,
+                toEditPicture,
+                setToEditPicture,
+                editModalOpen,
+                setEditModalOpen,
+                deleteModalOpen,
+                setDeleteModalOpen,
+                toDeletePicture,
+                setToDeletePicture,
+                deletePicture,
+                changeVisibility,
+                userPictures,
+                setUserPictures
             }}
         >
             {children}
