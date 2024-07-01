@@ -18,7 +18,7 @@ module.exports = async (req, res, next) => {
             throw new CustomError("Picture not found", `picture with slug ${slug} was not found`, 404);
         }
 
-        if (user.id !== picture.userId) {
+        if (user.id !== picture.userId && user.role !== 'SUPERADMIN') {
             throw new CustomError("Insufficient permission", "You are only allowed to update or delete your own pictures", 401);
         }
 

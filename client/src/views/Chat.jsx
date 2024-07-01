@@ -50,11 +50,17 @@ export default function () {
 
         if (location?.state?.user) {
             console.log('location user not und')
-            setActiveConversation(getConversationFromState())
+            const existingConversation = getConversationFromState()
+            setActiveConversation(existingConversation)
+            setConversations(oldVal => [existingConversation, ...oldVal])
         } else {
 
             setActiveConversation(conversations[0])
         }
+    }, [])
+
+    useEffect(() => {
+
     }, [conversations])
 
 

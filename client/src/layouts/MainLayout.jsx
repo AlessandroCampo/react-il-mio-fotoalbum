@@ -8,9 +8,11 @@ import { BsFillPlusCircleFill as PlusIcon } from "react-icons/bs";
 import EditModal from "../components/modals/EditModal";
 import { useGlobal } from "../contexts/globalContext";
 import GeneralModal from "../components/modals/GeneralModal";
+import RegisterModal from "../components/LoginModal/RegisterModal";
 
 export default function () {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
+    const [registerModalOpen, setRegisterModalOpen] = useState(false);
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const { editModalOpen, setEditModalOpen, deleteModalOpen, setDeleteModalOpen, toDeletePicture, deletePicture } = useGlobal();
 
@@ -20,7 +22,8 @@ export default function () {
         <div className="layout-container flex flex-col w-full h-screen relative">
             <Navbar openLoginModal={() => setLoginModalOpen(true)} />
 
-            <LoginModal open={loginModalOpen} setOpen={setLoginModalOpen} />
+            <LoginModal open={loginModalOpen} setOpen={setLoginModalOpen} openRegister={setRegisterModalOpen} />
+            <RegisterModal open={registerModalOpen} setOpen={setRegisterModalOpen} openLogin={setLoginModalOpen} />
             <CreateModal open={createModalOpen} setOpen={setCreateModalOpen} />
             <EditModal open={editModalOpen} setOpen={setEditModalOpen} />
             <GeneralModal

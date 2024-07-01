@@ -86,4 +86,49 @@ const pictureCreateSchema = Joi.object({
 
 });
 
-module.exports = { pictureCreateSchema }
+const pictureUpdateSchema = Joi.object({
+    title: Joi.string()
+        .trim()
+        .max(100)
+        .required()
+        .messages({
+            'string.base': 'Title must be a string',
+            'string.empty': 'Title cannot be empty',
+            'string.max': 'Title cannot be longer than {#limit} characters',
+            'any.required': 'Title is required',
+        }),
+
+    description: Joi.string()
+        .trim()
+        .max(1000)
+        .required()
+        .messages({
+            'string.base': 'Description must be a string',
+            'string.empty': 'Description cannot be empty',
+            'string.max': 'Description cannot be longer than {#limit} characters',
+            'any.required': 'Description is required',
+        }),
+    categories: Joi.array()
+        .items(Joi.number())
+        .external(validateCategories, 'validate categories')
+        .required()
+        .messages({
+            'any.required': 'Categories are required',
+            'array.base': 'Categories must be an array',
+            'array.empty': 'Categories array cannot be empty',
+            'any.custom': 'Invalid categories provided',
+        }),
+    userId: Joi.number()
+        .required()
+        .external(async (value, helpers) => {
+            const foundUser = await prisma.user.findUniqueOrThrow({
+                where: { id: value }
+            })
+            if (foundUser) {
+                return foundUser.id
+            }
+        })
+
+})
+
+module.exports = { pictureCreateSchema, pictureUpdateSchema }

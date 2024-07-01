@@ -47,6 +47,15 @@ const AuthProvider = ({ children }) => {
 
     }
 
+    const register = async (payload) => {
+
+        const { data } = await customAxiosInstance.post('/users/signup', payload);
+        localStorage.setItem('museAuthToken', data.token);
+        localStorage.setItem('museUsername', data.user.username);
+        setUser(data.user);
+
+    }
+
     const logout = async () => {
         localStorage.removeItem('museAuthToken');
         localStorage.removeItem('museUsername');
@@ -62,7 +71,9 @@ const AuthProvider = ({ children }) => {
                     authId,
                     login,
                     logout,
-                    loadingAuth
+                    loadingAuth,
+                    register
+
                 }
             }
         >

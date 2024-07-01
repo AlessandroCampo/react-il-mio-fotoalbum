@@ -22,6 +22,7 @@ const userRouter = require('./routers/userRouter.js');
 const pictureRouter = require('./routers/pictureRouter.js');
 const messageRouter = require('./routers/messageRouter.js');
 const { getCategories } = require('./controllers/pictureController.js');
+const { getResearch } = require('./controllers/generalController.js');
 
 
 
@@ -41,9 +42,13 @@ app.use((req, res, next) => {
 //router handled paths
 app.use('/users', userRouter);
 app.use('/pictures', pictureRouter);
-app.use('/messages', messageRouter)
+app.use('/messages', messageRouter);
+
+
+
 
 app.get('/categories', getCategories)
+app.get('/research', getResearch);
 
 app.get('/', (req, res) => {
     res.send('Hello world')

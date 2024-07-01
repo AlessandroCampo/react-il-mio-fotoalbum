@@ -24,10 +24,10 @@ export default function ({ lastMessage, inter, onClick }) {
                 </div>
                 <div className="flex items-center gap-4">
                     <span>
-                        {lastMessage.content}
+                        {lastMessage?.content || ''}
                     </span>
                     <span>
-                        {formatTimestamp(lastMessage.createdAt)}
+                        {lastMessage?.createdAt ? formatTimestamp(lastMessage?.createdAt) : ''}
                     </span>
                 </div>
             </div>

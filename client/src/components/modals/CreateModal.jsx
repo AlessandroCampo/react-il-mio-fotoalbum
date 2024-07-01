@@ -14,7 +14,7 @@ import { useNavigate } from "react-router";
 export default function ({ open, setOpen }) {
 
     const formRef = useRef(null);
-    const [createErrors, setcreateErrors] = useState([]);
+    const [createError, setcreateError] = useState('');
     const { categories, notify } = useGlobal();
     const [image, setImage] = useState(undefined);
     const [loading, setLoading] = useState(false);
@@ -44,17 +44,20 @@ export default function ({ open, setOpen }) {
             const { data } = await customAxiosInstance.post(`pictures`, formData);
             console.log(data);
             notify(`Picture ${data.picture.title} has been succesfully posted`, 'success');
-            setLoading(false);
+
             setOpen(false);
             navgiate(`/pin/${data.picture.slug}`);
 
         } catch (err) {
             console.error(err);
+            setcreateError(err.response.data.error.message || 'error creating your picture')
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleClose = () => {
-        setcreateErrors([]);
+        setcreateError('');
         setOpen(false)
     }
 
@@ -150,8 +153,8 @@ export default function ({ open, setOpen }) {
 
                         />
                         {
-                            createErrors && <div className="error-message text-theme max-w-full my-4">
-                                {createErrors[0]}
+                            createError && <div className="error-message text-theme max-w-full my-4">
+                                {createError}
                             </div>
                         }
                         <button

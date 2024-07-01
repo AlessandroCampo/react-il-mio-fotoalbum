@@ -9,7 +9,7 @@ const handleFileUplaod = require('../middlewares/uploadFile.js');
 const auth = require('../middlewares/auth.js');
 const isUserPicture = require('../middlewares/isUserPicture.js');
 const validator = require('../middlewares/validator.js');
-const { pictureCreateSchema } = require('../validations/pictureValidation.js')
+const { pictureCreateSchema, pictureUpdateSchema } = require('../validations/pictureValidation.js')
 
 
 router.get('/', index);
@@ -18,7 +18,7 @@ router.post('/', handleFileUplaod, auth, validator(pictureCreateSchema), create)
 router.get('/:slug', show);
 router.delete('/:slug', auth, isUserPicture, destroy);
 router.post('/:slug/like', auth, like)
-router.put('/:slug', auth, isUserPicture, update);
+router.put('/:slug', auth, isUserPicture, validator(pictureUpdateSchema), update);
 router.patch('/:slug/change-visibility', auth, isUserPicture, hideOrShow);
 
 module.exports = router;

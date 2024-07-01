@@ -1,43 +1,52 @@
 import { Dialog, DialogTitle } from "@mui/material";
 import logo from '../../assets/img/logo.png'
 import { useEffect, useRef, useState } from "react";
-import { HiOutlineLockClosed as PassIcon, HiOutlineUser as UserIcon, HiMail as EmailIcon } from "react-icons/hi";
+import { HiOutlineLockClosed as PassIcon, HiOutlineUser as UserIcon, HiOutlineMail as EmailIcon, HiOutlinePhotograph as ImageIcon } from "react-icons/hi";
 import { AiOutlineClose as CloseIcon } from "react-icons/ai";
 import { useAuth } from "../../contexts/authContext";
+import { BeatLoader } from "react-spinners";
 
-export default function ({ open, setOpen, openRegister }) {
-    // const emptyLoginErrors = {
-    //     username: [],
-    //     password: []
-    // }
+export default function ({ open, setOpen, openLogin }) {
 
-    const { login, isLoggedIn } = useAuth();
-
+    const { register, isLoggedIn } = useAuth();
+    const [loading, setLoading] = useState(false);
     const formRef = useRef(null);
-    const [loginError, setLoginError] = useState('');
+    const [registerError, setRegisterError] = useState('');
+    const [pictureLabel, setPictureLabel] = useState('Upload your profile picture')
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         const formData = new FormData(formRef.current);
 
         const username = formData.get('username');
         const password = formData.get('password');
+        const password_confirmation = formData.get('password-confirmation');
+        const image = formData.get('image');
+        const email = formData.get('email');
+        console.log(image);
+
+        if (password !== password_confirmation) {
+            setRegisterError("Passwords don't match")
+            return
+        }
+
+        formData.delete('password-confirmation');
+
         try {
-            await login({ username, password });
+            await register(formData);
         } catch (err) {
             const errorMessage = err?.response?.data?.error?.message;
-            setLoginError(errorMessage);
+            console.error(err);
+            setRegisterError(errorMessage);
+        } finally {
+            setLoading(false);
         }
 
     }
 
     const handleClose = () => {
-        setLoginError('');
-        setOpen(false)
-    }
-
-    const goToRegister = () => {
-        openRegister(true)
+        setRegisterError('');
         setOpen(false)
     }
 
@@ -46,6 +55,12 @@ export default function ({ open, setOpen, openRegister }) {
             handleClose();
         }
     }, [isLoggedIn]);
+
+
+    const goToLogin = () => {
+        openLogin(true)
+        setOpen(false)
+    }
 
 
     return (
@@ -75,7 +90,17 @@ export default function ({ open, setOpen, openRegister }) {
                     ref={formRef}
                     onSubmit={handleSubmit}
                 >
+                    <div className="input bg-input flex gap-3 items-center ps-4 rounded-md py-3 pe-3">
+                        <EmailIcon
+                            className='text-xl no-hover-icon'
+                        />
+                        <input type="email"
+                            className="bg-transparent w-full  border-transparent focus:border-transparent focus:ring-0"
+                            placeholder="Your Email"
+                            name='email'
 
+                        />
+                    </div>
 
                     <div className="input bg-input flex gap-3 items-center ps-4 rounded-md py-3 pe-3">
                         <UserIcon
@@ -97,15 +122,36 @@ export default function ({ open, setOpen, openRegister }) {
                             name='password'
                             placeholder="Your Password" />
                     </div>
+                    <div className="input bg-input flex gap-3 items-center ps-4 rounded-md py-3 pe-3">
+                        <PassIcon
+                            className='text-xl no-hover-icon'
+                        />
+                        <input type="password"
+                            className="bg-transparent w-full border-transparent focus:border-transparent focus:ring-0"
+                            name='password-confirmation'
+                            placeholder="Confirm Password" />
+                    </div>
+                    <div className="input bg-input flex gap-3 items-center ps-4 rounded-md py-3 pe-3">
+                        <ImageIcon className='text-xl' />
+                        <label htmlFor="profile_pic" className="cursor-pointer text-gray-400">{pictureLabel}</label>
+                        <input
+                            type="file" id="profile_pic"
+                            className="bg-transparent w-full hidden"
+                            name='image'
+                            accept=".png, .jpg, .jpeg"
+                            onChange={(e) => { setPictureLabel(e.target.files[0].name) }}
+
+                        />
+                    </div>
                     {
-                        loginError && <div className="error-message text-theme max-w-full my-4">
-                            {loginError}
+                        registerError && <div className="error-message text-theme max-w-full my-4">
+                            {registerError}
                         </div>
                     }
                     <button
                         className="bg-theme hover:bg-themeDarker text-white text-lg font-bold py-2 px-4 rounded-full transition duration-300 mt-3"
                     >
-                        Log In
+                        {loading ? <BeatLoader color="white" size={10} margin={0} /> : 'Sign Up'}
                     </button >
                     {/* <button
                     className="bg-input hover:bg-gray-900 text-gray-400 border-0 border-gray-400 text-lg font-bold py-2 px-4 rounded-xl transition duration-300"
@@ -116,9 +162,9 @@ export default function ({ open, setOpen, openRegister }) {
 
                     <p
                         className="font-semibold mt-3 cursor-pointer ms-3"
-                        onClick={goToRegister}
+                        onClick={goToLogin}
                     >
-                        Don't have an account yet?
+                        Already got an account?
                     </p >
 
                 </form >
