@@ -10,6 +10,8 @@ import Single from "./views/Single";
 import { AuthProvider } from "./contexts/authContext";
 import User from "./views/User";
 import Chat from "./views/Chat";
+import Explore from "./views/Explore";
+import Category from "./views/Category";
 
 
 
@@ -31,6 +33,10 @@ const router = createBrowserRouter([
                 element: <Home />
             },
             {
+                path: '/explore',
+                element: <Explore />
+            },
+            {
                 path: '/:username',
                 element: <User />
             },
@@ -41,6 +47,10 @@ const router = createBrowserRouter([
             {
                 path: '/pin/:slug',
                 element: <Single />
+            },
+            {
+                path: '/explore/:name',
+                element: <Category />
             },
         ]
     },

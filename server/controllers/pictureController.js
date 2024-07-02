@@ -252,18 +252,7 @@ const hideOrShow = async (req, res, next) => {
     }
 }
 
-const getCategories = async (req, res, next) => {
-    try {
 
-        const categories = await prisma.category.findMany();
-        return res.json({
-            categories
-        })
-    } catch (err) {
-
-        next(err);
-    }
-}
 
 const like = async (req, res, next) => {
     const { slug } = req.params;
@@ -317,4 +306,4 @@ const like = async (req, res, next) => {
 
 // }
 
-module.exports = { index, create, show, destroy, update, hideOrShow, getCategories, like, getPersonalizedFeed }
+module.exports = { index, create, show, destroy, update, hideOrShow, like, getPersonalizedFeed }

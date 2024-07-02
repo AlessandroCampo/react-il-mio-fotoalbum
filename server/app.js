@@ -21,8 +21,8 @@ const globalErrorHandler = require('./middlewares/globalErrorHandler.js');
 const userRouter = require('./routers/userRouter.js');
 const pictureRouter = require('./routers/pictureRouter.js');
 const messageRouter = require('./routers/messageRouter.js');
-const { getCategories } = require('./controllers/pictureController.js');
-const { getResearch } = require('./controllers/generalController.js');
+const categoryRouter = require('./routers/categoryRouter.js');
+const { getResearch, getCategories } = require('./controllers/generalController.js');
 
 
 
@@ -43,11 +43,9 @@ app.use((req, res, next) => {
 app.use('/users', userRouter);
 app.use('/pictures', pictureRouter);
 app.use('/messages', messageRouter);
+app.use('/categories', categoryRouter);
 
 
-
-
-app.get('/categories', getCategories)
 app.get('/research', getResearch);
 
 app.get('/', (req, res) => {

@@ -60,6 +60,9 @@ export default function Navbar({ openLoginModal }) {
                 case 'Picture':
                     navigate(`/pin/${value.slug}`);
                     break;
+                case 'Category':
+                    navigate(`/explore/${value.label}`);
+                    break;
                 default:
                     return;
             }
@@ -82,7 +85,7 @@ export default function Navbar({ openLoginModal }) {
                     <img src={logo} alt="logo" />
                 </figure>
                 <IoHomeOutline onClick={returnToHome} />
-                <IoCompassOutline />
+                <IoCompassOutline onClick={(() => { navigate(`/explore`) })} />
             </div>
             <div className="searchbar">
                 <IoSearch className="text-2xl me-3 no-hover-icon" />
@@ -108,6 +111,7 @@ export default function Navbar({ openLoginModal }) {
                                 sx: {
                                     color: 'white',
                                     border: 'none',
+                                    height: '40px',
                                     '&:before': { border: 'none' },
                                     '&:after': { border: 'none' },
                                     '&:hover:not(.Mui-disabled):before': { border: 'none' },

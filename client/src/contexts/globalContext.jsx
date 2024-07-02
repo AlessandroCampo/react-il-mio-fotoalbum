@@ -90,6 +90,11 @@ function GlobalProvider({ children }) {
         setCategories(data.categories);
     }
 
+    const getSingleCategory = async (name) => {
+        const { data } = await axiosClient.get(`/categories/${name}`);
+        return data;
+    }
+
     useEffect(() => {
         getUserConversations();
         getCategories();
@@ -170,6 +175,7 @@ function GlobalProvider({ children }) {
                 setStore,
                 getUserInfo,
                 categories,
+                getSingleCategory,
                 notify,
                 conversations,
                 setConversations,

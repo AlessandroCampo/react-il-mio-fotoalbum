@@ -82,7 +82,7 @@ export default function () {
         picture && <div className="single-page-container">
             <ArrowLeftIcon
                 className="back-icon"
-                onClick={() => { navigate('/') }}
+                onClick={() => { navigate(-1) }}
             />
             <div className="card-big">
                 <figure>

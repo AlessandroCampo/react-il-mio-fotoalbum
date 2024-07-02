@@ -8,6 +8,7 @@ import { useGlobal } from "../../contexts/globalContext";
 import { useAuth } from "../../contexts/authContext";
 import { IoTrashBin as DeleteIcon, IoEye as VisibleIcon, IoEyeOff as HiddenIcon } from "react-icons/io5";
 import { useEffect, useState } from "react";
+import { Skeleton } from "@mui/material";
 
 
 export default function ({ picture }) {
@@ -17,6 +18,7 @@ export default function ({ picture }) {
     const { authId } = useAuth();
     const isUserPic = authId === userId;
     const [isVisible, setIsVisible] = useState(picture.isVisibile);
+    const [imgLoaded, setImgLoaded] = useState(false);
 
     useEffect(() => {
 
@@ -64,54 +66,65 @@ export default function ({ picture }) {
 
 
     return (
-        <figure
-            className="card-wrapper group"
-            onClick={() => { navigate(`/pin/${slug}`) }}
-            onContextMenu={(e) => { e.preventDefault() }}
-        >
-            <img
-                src={image}
-                alt={slug}
-            />
-            <div className="overlay">
-                {
-                    isUserPic ?
-                        <button
-                            className='button-theme'
-                            onClick={openEditModal}
-                        >
-                            Edit
-                        </button> :
-                        <button className='button-theme'>
-                            Save
-                        </button>
-                }
+        <>
+            {!imgLoaded && (
+                <Skeleton
+                    variant="rounded"
+                    width={236}
+                    height={420}
+                    animation="pulse"
+                    sx={{
+                        bgcolor: 'grey.600',
+                        borderRadius: '1.5rem',
+                    }}
+                />
+            )}
+            <figure
+                className={`card-wrapper group ${!imgLoaded ? 'hidden' : ''}`}
+                onClick={() => { navigate(`/pin/${slug}`); }}
+                onContextMenu={(e) => { e.preventDefault(); }}
+            >
+                <img
+                    src={image}
+                    alt={slug}
+                    onLoad={() => setImgLoaded(true)}
+                    className={imgLoaded ? 'block' : 'hidden'}
+                />
+                {imgLoaded && (
+                    <div className="overlay">
+                        {isUserPic ? (
+                            <button
+                                className="button-theme"
+                                onClick={openEditModal}
+                            >
+                                Edit
+                            </button>
+                        ) : (
+                            <button className="button-theme">
+                                Save
+                            </button>
+                        )}
 
-                {
-                    !isUserPic ? <div className="overlay-icons ">
-                        <HeartIcon
-                            onClick={sendLike}
-                        />
-                        <DownloadIcon
-                            onClick={downloadImage}
-                        />
-                    </div> : <div className="overlay-icons ">
-                        <DeleteIcon
-                            onClick={openDeleteMode}
-                        />
-                        {
-                            isVisible ?
-                                <HiddenIcon
-                                    onClick={hideOrShow} /> :
-                                <VisibleIcon
-                                    onClick={hideOrShow} />
-
-                        }
-
+                        <div className="overlay-icons">
+                            {!isUserPic ? (
+                                <>
+                                    <HeartIcon onClick={sendLike} />
+                                    <DownloadIcon onClick={downloadImage} />
+                                </>
+                            ) : (
+                                <>
+                                    <DeleteIcon onClick={openDeleteMode} />
+                                    {isVisible ? (
+                                        <HiddenIcon onClick={hideOrShow} />
+                                    ) : (
+                                        <VisibleIcon onClick={hideOrShow} />
+                                    )}
+                                </>
+                            )}
+                        </div>
                     </div>
-                }
-
-            </div>
-        </figure>
-    )
+                )}
+            </figure>
+        </>
+    );
 }

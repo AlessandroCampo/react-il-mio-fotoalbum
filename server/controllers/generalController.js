@@ -76,7 +76,7 @@ const getResearch = async (req, res, next) => {
         }))
 
         res.json({
-            options: [...formattedPictures, ...formattedUsers]
+            options: [...formattedPictures, ...formattedUsers, ...formattedCategories]
         })
 
 
@@ -84,6 +84,9 @@ const getResearch = async (req, res, next) => {
         next(err);
     }
 }
+
+
+
 
 
 module.exports = { getResearch };
