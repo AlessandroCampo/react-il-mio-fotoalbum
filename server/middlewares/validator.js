@@ -4,6 +4,7 @@ function validateRequest(schema) {
             const validationRes = await schema.validateAsync(req.body, { abortEarly: false })
             console.log('from the validator', validationRes);
             if (validationRes.user) req.user = validationRes.user;
+            if (validationRes.categories) req.body.categories = validationRes.categories;
 
 
             next();

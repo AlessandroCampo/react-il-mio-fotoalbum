@@ -3,31 +3,31 @@ const Joi = require('joi');
 const CustomError = require('../utils/customError');
 const prisma = new PrismaClient();
 
-const validateCategories = async (value, helpers) => {
+const validateCategories = async (value, helpers, imageUrl) => {
 
-    const categoryIds = [];
-    for (let categoryId of value) {
-        categoryId = Number(categoryId);
-        if (isNaN(categoryId)) {
-            return helpers.error('any.invalid');
-        }
-        categoryIds.push(categoryId);
-    }
-
-
-    const categories = await prisma.category.findMany({
+    // Fetch all existing categories in a single query
+    const existingCategories = await prisma.category.findMany({
         where: {
-            id: {
-                in: categoryIds,
-            },
-        },
+            name: { in: value }
+        }
     });
 
-    if (categories.length !== categoryIds.length) {
-        return helpers.error('any.invalid');
-    }
+    const existingCategoryNames = existingCategories.map((cat) => cat.name);
+    const categoryIds = existingCategories.map(cat => cat.id);
 
-    return categoryIds
+    for (const name of value) {
+        if (!existingCategoryNames.includes(name)) {
+            const newCategory = await prisma.category.create({
+                data: {
+                    name,
+                    thumbnail: imageUrl
+                }
+            });
+            categoryIds.push(newCategory.id);
+        }
+    }
+    console.log(categoryIds, 'coming from sanitizer')
+    return categoryIds;
 };
 
 const pictureCreateSchema = Joi.object({
@@ -63,9 +63,14 @@ const pictureCreateSchema = Joi.object({
             'string.uri': 'Image must be a valid URL',
             'any.required': 'Image URL is required',
         }),
+
     categories: Joi.array()
-        .items(Joi.number())
-        .external(validateCategories, 'validate categories')
+        .items(Joi.string())
+        .external(async (value, helpers) => {
+            const { image } = helpers.state.ancestors[0];
+            const categoryIds = await validateCategories(value, helpers, image);
+            return categoryIds;
+        })
         .required()
         .messages({
             'any.required': 'Categories are required',
@@ -73,17 +78,17 @@ const pictureCreateSchema = Joi.object({
             'array.empty': 'Categories array cannot be empty',
             'any.custom': 'Invalid categories provided',
         }),
+
     userId: Joi.number()
         .required()
         .external(async (value, helpers) => {
             const foundUser = await prisma.user.findUniqueOrThrow({
                 where: { id: value }
-            })
+            });
             if (foundUser) {
-                return foundUser.id
+                return foundUser.id;
             }
         })
-
 });
 
 const pictureUpdateSchema = Joi.object({

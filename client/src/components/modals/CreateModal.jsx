@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import { AiOutlineClose as CloseIcon } from "react-icons/ai";
 import { Textarea } from "@headlessui/react";
 import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { useGlobal } from "../../contexts/globalContext";
 import { FaCircleArrowUp as ArrowUpIcon } from "react-icons/fa6";
 import customAxiosInstance from "../../axiosClient";
 import { BeatLoader } from "react-spinners";
 import { useNavigate } from "react-router";
+import { capitalizeFirstLetter } from "../../utils";
 
 
 
@@ -19,7 +21,7 @@ export default function ({ open, setOpen }) {
     const [image, setImage] = useState(undefined);
     const [loading, setLoading] = useState(false);
     const options = categories?.map(c => {
-        return { value: c.id, label: c.name }
+        return { value: c.name.toLowerCase(), label: c.name }
     })
     const navgiate = useNavigate();
 
@@ -37,7 +39,7 @@ export default function ({ open, setOpen }) {
         const formData = new FormData(formRef.current);
 
         selectedCategories.forEach((category) => {
-            formData.append('categories[]', parseInt(category.value));
+            formData.append('categories[]', category.label);
         });
 
         try {
@@ -54,6 +56,11 @@ export default function ({ open, setOpen }) {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleCreate = (inputValue) => {
+        const newOption = { value: inputValue.toLowerCase(), label: capitalizeFirstLetter(inputValue) };
+        handleSelectChange([...selectedCategories, newOption]);
     };
 
     const handleClose = () => {
@@ -142,7 +149,7 @@ export default function ({ open, setOpen }) {
                             name="description"
                         />
 
-                        <Select
+                        <CreatableSelect
                             isMulti
                             options={options}
                             className="basic-multi-select cursor-pointer"
@@ -150,7 +157,7 @@ export default function ({ open, setOpen }) {
                             menuShouldScrollIntoView={false}
                             value={selectedCategories}
                             onChange={handleSelectChange}
-
+                            onCreateOption={handleCreate}
                         />
                         {
                             createError && <div className="error-message text-theme max-w-full my-4">

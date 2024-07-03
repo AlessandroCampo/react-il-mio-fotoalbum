@@ -125,9 +125,9 @@ const getPersonalizedFeed = async (req, res, next) => {
 
 const create = async (req, res, next) => {
     const { title, description, userId, image, categories } = req.body;
-    console.log(req.body);
+    console.log(req.body.categories, 'in controller');
     const user = req.user;
-    const formattedCategories = categories.map(c => ({ id: Number(c) }));
+    const categoryIds = categories.map(cat => ({ id: parseInt(cat) }));
     try {
         const data = {
             title,
@@ -136,7 +136,7 @@ const create = async (req, res, next) => {
             image,
             slug: await createUniqueSlug(title),
             categories: {
-                connect: formattedCategories
+                connect: categoryIds
             }
         }
 

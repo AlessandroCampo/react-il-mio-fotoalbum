@@ -15,6 +15,7 @@ import { useAuth } from "../../contexts/authContext";
 import Dropdown from "../Dropdown";
 import { useNavigate } from "react-router";
 import customAxiosInstance from "../../axiosClient";
+import Multiselect from "../Multiselect";
 
 export default function Navbar({ openLoginModal }) {
     const [searchValue, setSearchValue] = useState('');
@@ -89,46 +90,13 @@ export default function Navbar({ openLoginModal }) {
             </div>
             <div className="searchbar">
                 <IoSearch className="text-2xl me-3 no-hover-icon" />
-                <Autocomplete
-                    freeSolo
-                    id="free-solo-2-demo"
-                    className="w-full"
-                    disableClearable
+                <Multiselect
+                    searchValue={searchValue}
+                    selectedValue={selectedValue}
+                    handleInputChange={handleInputChange}
+                    handleOptionSelected={handleOptionSelected}
                     options={options}
-                    groupBy={(option) => option.type}
-                    onChange={handleOptionSelected}
-                    getOptionLabel={(option) => option.label || ''}
-                    inputValue={searchValue}
-                    value={selectedValue}
-                    onInputChange={handleInputChange}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            placeholder="Search"
-                            InputProps={{
-                                ...params.InputProps,
-                                type: 'search',
-                                sx: {
-                                    color: 'white',
-                                    border: 'none',
-                                    height: '40px',
-                                    '&:before': { border: 'none' },
-                                    '&:after': { border: 'none' },
-                                    '&:hover:not(.Mui-disabled):before': { border: 'none' },
-                                }
-                            }}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    '& fieldset': { border: 'none' },
-                                    '&:hover fieldset': { border: 'none' },
-                                    '&.Mui-focused fieldset': { border: 'none' },
-                                    color: 'white',
-                                },
-                                input: { color: 'lightslategray' }
-                            }}
-                        />
-                    )}
-                    sx={{ color: 'white' }}
+
                 />
             </div>
             <div className="navbar-right">

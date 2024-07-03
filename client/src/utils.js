@@ -65,3 +65,6 @@ export const handleDownload = async (url, name) => {
         console.error('Error downloading image:', error);
     }
 };
+
+
+export const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
