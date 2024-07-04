@@ -12,32 +12,59 @@ import { Skeleton } from "@mui/material";
 
 
 export default function ({ picture }) {
-    const { image, slug, id, userId, isVisibile } = picture;
+
     const navigate = useNavigate();
-    const { likePicture, setEditModalOpen, setToEditPicture, setToDeletePicture, setDeleteModalOpen, changeVisibility, notify } = useGlobal();
+    const { likePicture, unlikePicture, savePicture, setEditModalOpen, setToEditPicture, setToDeletePicture, setDeleteModalOpen, changeVisibility, notify, downloadPicture } = useGlobal();
+    const [pictureState, setPictureState] = useState(picture);
+    const { image, slug, id, userId, isVisibile } = pictureState;
     const { authId } = useAuth();
     const isUserPic = authId === userId;
-    const [isVisible, setIsVisible] = useState(picture.isVisibile);
+
+    const [isVisible, setIsVisible] = useState(pictureState.isVisibile);
     const [imgLoaded, setImgLoaded] = useState(false);
+    const isLiked = pictureState?.likes.find(l => l.userId === authId);
 
     useEffect(() => {
 
-    }, [isVisibile])
+    }, [isVisibile, isLiked])
 
 
-    const downloadImage = (e) => {
+    const downloadImage = async (e) => {
         e.stopPropagation();
-        handleDownload(picture.image, picture.slug)
+        handleDownload(picture.image, picture.slug);
+        try {
+            await downloadPicture(picture.slug, picture.id);
+        } catch (err) {
+            console.error(err);
+        }
+
     }
 
     const sendLike = async (e) => {
         e.stopPropagation();
+        if (isLiked) {
+            try {
+                const likeId = picture.likes.find(l => l.userId === authId).id;
+                const removedLike = await unlikePicture(picture.slug, likeId);
+            } catch (err) {
+                console.error(err);
+            }
+            return
+        }
         try {
             const like = await likePicture(slug, id, picture.User.id);
+            if (like) {
+                setPictureState(oldPic => ({
+                    ...oldPic,
+                    likes: [...oldPic.likes, like]
+                }))
+            }
         } catch (err) {
             console.error(err);
         }
     }
+
+
 
     const openEditModal = (e) => {
         e.stopPropagation();
@@ -49,6 +76,16 @@ export default function ({ picture }) {
         e.stopPropagation();
         setToDeletePicture(picture)
         setDeleteModalOpen(true)
+    }
+
+    const save = async (e) => {
+        e.stopPropagation();
+        try {
+            const bookmark = await savePicture(picture.slug, picture.id);
+            console.log(bookmark);
+        } catch (err) {
+            console.error(err);
+        }
     }
 
 
@@ -100,7 +137,10 @@ export default function ({ picture }) {
                                 Edit
                             </button>
                         ) : (
-                            <button className="button-theme">
+                            <button
+                                className="button-theme"
+                                onClick={save}
+                            >
                                 Save
                             </button>
                         )}
@@ -108,7 +148,7 @@ export default function ({ picture }) {
                         <div className="overlay-icons">
                             {!isUserPic ? (
                                 <>
-                                    <HeartIcon onClick={sendLike} />
+                                    <HeartIcon onClick={sendLike} className={`${isLiked ? 'text-theme' : ''}`} />
                                     <DownloadIcon onClick={downloadImage} />
                                 </>
                             ) : (

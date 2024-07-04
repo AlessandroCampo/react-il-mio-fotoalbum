@@ -48,9 +48,30 @@ function GlobalProvider({ children }) {
             authorId
         }
         const { data } = await axiosClient.post(`/pictures/${slug}/like`, reqData);
-        console.log(data);
         return data.like;
     };
+
+    const unlikePicture = async (slug, likeId) => {
+        const reqData = {
+            likeId
+        };
+        const { data } = await axiosClient.delete(`/pictures/${slug}/like`, { data: reqData });
+        return data;
+    };
+
+    const downloadPicture = async (slug, pictureId) => {
+        const { data } = await axiosClient.post(`/pictures/${slug}/download`, { pictureId });
+        return data;
+    };
+
+    const viewPicture = async (slug, pictureId) => {
+        const { data } = await axiosClient.post(`/pictures/${slug}/view`, { pictureId });
+        return data;
+    };
+
+    const savePicture = async (slug, pictureId) => await axiosClient.post(`/pictures/${slug}/save`, { pictureId });
+
+
 
     const deletePicture = async (slug) => {
         try {
@@ -180,6 +201,10 @@ function GlobalProvider({ children }) {
                 conversations,
                 setConversations,
                 likePicture,
+                unlikePicture,
+                downloadPicture,
+                viewPicture,
+                savePicture,
                 toEditPicture,
                 setToEditPicture,
                 editModalOpen,

@@ -180,6 +180,7 @@ const show = async (req, res, next) => {
                     }
                 },
                 categories: true,
+                downloads: true,
                 likes: true,
                 saves: true,
                 views: true
@@ -282,28 +283,63 @@ const like = async (req, res, next) => {
 
 }
 
-// const removeLike = async (req, res, next) => {
-//     const { slug } = req.params;
-//     const { likeId } = req.body;
-//     try {
-//         if (!likeId) {
-//             throw new CustomError('Like not found', `You have not liked the post with slug ${slug}`, 404);
-//         }
-//         const removedLike = await prisma.like.delete({
-//             where: {
-//                 id: likeId
-//             }
-//         });
-//         res.json({
-//             message: `Your like has been removed from the post  with slug ${slug}`,
-//             removedLike,
-//         })
-//     } catch (err) {
-//         const customError = prismaErorrHandler(err);
-//         next(customError);
-//     }
+const removeLike = async (req, res, next) => {
+    const { slug } = req.params;
+    const { likeId } = req.body;
+    console.log(req.body);
+    try {
+        const like = await prisma.like.delete({
+            where: {
+                id: likeId
+            }
+        });
+        res.json(like)
+    } catch (err) {
+        next(err);
+    }
 
 
-// }
+}
 
-module.exports = { index, create, show, destroy, update, hideOrShow, like, getPersonalizedFeed }
+const storeDownload = async (req, res, next) => {
+    const { userId, pictureId } = req.body;
+    const data = {
+        userId, pictureId
+    }
+    try {
+        const download = await prisma.download.create({ data });
+        res.json(download);
+    } catch (err) {
+        next(err);
+    }
+}
+
+const storeView = async (req, res, next) => {
+    const { userId, pictureId } = req.body;
+    const data = {
+        userId, pictureId
+    }
+    try {
+        const view = await prisma.view.create({ data });
+        res.json(view);
+    } catch (err) {
+        next(err);
+    }
+}
+
+const storeSave = async (req, res, next) => {
+    const { userId, pictureId } = req.body;
+    const data = {
+        userId, pictureId
+    }
+    try {
+        const save = await prisma.save.create({ data });
+        res.json(save);
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+
+module.exports = { index, create, show, destroy, update, hideOrShow, like, getPersonalizedFeed, removeLike, storeDownload, storeView, storeSave }

@@ -3,6 +3,7 @@ import axiosInstance from "../axiosClient.js"
 import { useNavigate, useParams } from "react-router-dom";
 import { Avatar } from "@mui/material";
 import { IoBookmarkOutline as BookmarkIconOutline, IoBookmark as BookmarkIcon, IoHeart as HeartIcon, IoHeartOutline as HeartIconOutline, IoSave as DownloadIcon, IoSaveOutline as DownloadIconOutline, IoTrashBin as DeleteIcon, IoEye as VisibleIcon, IoEyeOff as HiddenIcon } from "react-icons/io5";
+import { TbViewfinder as ViewIcon } from "react-icons/tb";
 import { FaArrowLeft as ArrowLeftIcon } from "react-icons/fa";
 import './viewsStyles/singleStyles.css';
 import { handleDownload } from "../utils.js";
@@ -13,10 +14,12 @@ export default function () {
 
     const [picture, setPicture] = useState(undefined);
     const { slug } = useParams();
-    const { likePicture, setEditModalOpen, setToEditPicture, setDeleteModalOpen, setToDeletePicture, changeVisibility, notify } = useGlobal();
+    const { likePicture, unlikePicture, viewPicture, setEditModalOpen, setToEditPicture, setDeleteModalOpen, setToDeletePicture, changeVisibility, notify } = useGlobal();
     const { user, authId } = useAuth();
     const navigate = useNavigate();
-    let isUserPic = picture?.userId == authId
+    let isUserPic = picture?.userId == authId;
+    const isLiked = picture?.likes.find(l => l.userId === authId);
+    const isViewed = picture?.views.find(v => v.userId === authId);
 
     const fetchSinglePicture = async () => {
         try {
@@ -40,10 +43,30 @@ export default function () {
         }
     }
 
+    const sendView = async () => {
+        try {
+            const view = await viewPicture(picture.slug, picture.id);
+            setPicture(oldPic => ({
+                ...oldPic,
+                views: [...oldPic.views, view]
+            }))
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {
+        if (!isViewed && picture) {
+            sendView();
+        }
+    }, [picture]);
+
 
 
     useEffect(() => {
         fetchSinglePicture()
+
     }, [slug])
 
     const openEditModal = (e) => {
@@ -59,6 +82,18 @@ export default function () {
 
 
     const sendLike = async () => {
+        if (isLiked) {
+            const likeId = picture.likes.find(l => l.userId === authId).id;
+            console.log(likeId);
+            const removedLike = await unlikePicture(slug, likeId);
+            setPicture(pic => {
+                return {
+                    ...pic,
+                    likes: pic.likes.filter(l => l.id !== removedLike.id)
+                }
+            })
+            return
+        }
         try {
             const like = await likePicture(slug, picture.id, picture.User.id);
             setPicture(pic => {
@@ -122,7 +157,7 @@ export default function () {
 
                                 <HeartIcon
                                     onClick={sendLike}
-                                    className={`${picture.likes.find(l => l.userId === user?.id) ? 'text-theme' : ''}`}
+                                    className={`${isLiked ? 'text-theme' : ''}`}
                                 />
                                 <BookmarkIcon />
                             </div>
@@ -172,12 +207,30 @@ export default function () {
                         </p>
                     </div>
                     <div>
-                        <div className="likes-counter flex items-center gap-2 text-theme">
-                            <HeartIcon
-                                className="text-2xl no-hover-icon"
-                            />
-                            <div className="text-lg font-bold">
-                                {picture.likes.length}
+                        <div className="stats-container flex gap-4 items-center">
+                            <div className="likes-counter flex items-center gap-1 text-theme">
+                                <HeartIcon
+                                    className="text-2xl no-hover-icon"
+                                />
+                                <div className="text-lg font-bold">
+                                    {picture.likes.length}
+                                </div>
+                            </div>
+                            <div className="likes-counter flex items-center gap-1 text-theme">
+                                <DownloadIcon
+                                    className="text-2xl no-hover-icon"
+                                />
+                                <div className="text-lg font-bold">
+                                    {picture?.downloads?.length || 0}
+                                </div>
+                            </div>
+                            <div className="likes-counter flex items-center gap-1 text-theme">
+                                <ViewIcon
+                                    className="text-2xl no-hover-icon"
+                                />
+                                <div className="text-lg font-bold">
+                                    {picture?.views?.length || 0}
+                                </div>
                             </div>
                         </div>
 

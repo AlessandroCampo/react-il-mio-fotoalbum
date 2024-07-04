@@ -63,7 +63,8 @@ const getInfo = async (req, res, next) => {
             include: {
                 followedBy: true,
                 following: true,
-                pictures: true
+                pictures: true,
+                saves: true
             }
         });
         res.json({
