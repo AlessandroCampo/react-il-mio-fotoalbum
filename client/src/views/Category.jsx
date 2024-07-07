@@ -12,7 +12,6 @@ export default function () {
     const { getSingleCategory } = useGlobal();
 
     const fetchSingleCategory = async () => {
-        console.log(name);
         try {
             const foundCategory = await getSingleCategory(name);
             console.log(foundCategory);
@@ -34,9 +33,10 @@ export default function () {
                 />
             </div>
             <div className="pic-container flex gap-4 w-3/4 mx-auto flex-wrap mt-6  justify-center">
-                {category.pictures.map(p => (
+                {category.pictures.length > 0 && category.pictures.map(p => (
                     <Card
                         picture={p}
+                        key={`category-card-${p.id}`}
                     />
                 ))}
             </div>

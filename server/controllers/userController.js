@@ -23,7 +23,11 @@ const signup = async (req, res, next) => {
             data
         })
 
+
         const token = generateJWT(user)
+
+        //Removing password from the user object sent via json response
+        delete user.password;
 
         res.json({
             msg: 'A new user has been succesfully created',
@@ -43,6 +47,8 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
     const { user } = req;
     const token = generateJWT(user);
+    //Removing password from the user object sent via json response
+    delete user.password;
     res.json({
         user,
         token
@@ -67,6 +73,8 @@ const getInfo = async (req, res, next) => {
                 saves: true
             }
         });
+        //Removing password from the user object sent via json response
+        delete user.password;
         res.json({
             user
         })

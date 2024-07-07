@@ -12,10 +12,6 @@ const uploadFile = require('../middlewares/uploadFile.js');
 
 
 
-
-
-
-
 router.post('/signup', uploadFile, validator(registrationSchema), signup);
 router.post('/login', validator(loginSchema), login);
 router.get('/:username', auth, getInfo);

@@ -1,6 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
 const Joi = require('joi');
-const CustomError = require('../utils/customError');
 const prisma = new PrismaClient();
 
 const validateCategories = async (value, helpers, imageUrl) => {

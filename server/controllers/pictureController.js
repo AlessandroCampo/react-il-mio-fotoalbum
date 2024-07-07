@@ -183,7 +183,12 @@ const show = async (req, res, next) => {
                 downloads: true,
                 likes: true,
                 saves: true,
-                views: true
+                views: true,
+                comments: {
+                    include: {
+                        User: true
+                    }
+                }
             }
         })
         res.json(picture);
@@ -340,6 +345,30 @@ const storeSave = async (req, res, next) => {
     }
 }
 
+const addComment = async (req, res, next) => {
+    const { userId, pictureId, content } = req.body;
+    try {
+        const data = { userId, pictureId, content };
+        const comment = await prisma.comment.create({ data });
+        res.json(comment);
+    } catch (err) {
+        next(err);
+    }
+}
+
+const deleteComment = async (req, res, next) => {
+    const { userId, commentId } = req.body;
+    try {
+        const deletedComment = await prisma.comment.delete({
+            where: {
+                id: commentId
+            }
+        })
+        res.json(deletedComment);
+    } catch (err) {
+        next(err);
+    }
+}
 
 
-module.exports = { index, create, show, destroy, update, hideOrShow, like, getPersonalizedFeed, removeLike, storeDownload, storeView, storeSave }
+module.exports = { index, create, show, destroy, update, hideOrShow, like, getPersonalizedFeed, removeLike, storeDownload, storeView, storeSave, addComment, deleteComment }

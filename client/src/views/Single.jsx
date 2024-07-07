@@ -5,14 +5,21 @@ import { Avatar } from "@mui/material";
 import { IoBookmarkOutline as BookmarkIconOutline, IoBookmark as BookmarkIcon, IoHeart as HeartIcon, IoHeartOutline as HeartIconOutline, IoSave as DownloadIcon, IoSaveOutline as DownloadIconOutline, IoTrashBin as DeleteIcon, IoEye as VisibleIcon, IoEyeOff as HiddenIcon } from "react-icons/io5";
 import { TbViewfinder as ViewIcon } from "react-icons/tb";
 import { FaArrowLeft as ArrowLeftIcon } from "react-icons/fa";
+import { GoPaperAirplane as SendIcon } from "react-icons/go";
+import { BiSolidComment as CommentIcon } from "react-icons/bi";
 import './viewsStyles/singleStyles.css';
 import { handleDownload } from "../utils.js";
 import { useGlobal } from "../contexts/globalContext.jsx";
 import { useAuth } from "../contexts/authContext.jsx";
+import customAxiosInstance from "../axiosClient.js";
+import Comment from "../components/Comment.jsx";
+import { comment } from "postcss";
 
 export default function () {
 
     const [picture, setPicture] = useState(undefined);
+    const [newComment, setNewComment] = useState('');
+    const [visibleComments, setVisibleComments] = useState(3);
     const { slug } = useParams();
     const { likePicture, unlikePicture, viewPicture, setEditModalOpen, setToEditPicture, setDeleteModalOpen, setToDeletePicture, changeVisibility, notify } = useGlobal();
     const { user, authId } = useAuth();
@@ -56,11 +63,51 @@ export default function () {
         }
     }
 
+    const sendComment = async () => {
+
+        if (newComment.trim().length === 0)
+            return
+
+        const commentData = {
+            pictureId: picture.id,
+            userId: authId,
+            content: newComment
+        }
+
+        try {
+            const { data } = await customAxiosInstance.post(`/pictures/${picture.slug}/comment`, commentData);
+            console.log(data);
+            notify('your comment has been added', 'success');
+            data.User = user;
+            setNewComment('');
+            picture.comments = [...picture.comments, data];
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const deleteComment = (id) => {
+        setPicture(oldPic => ({
+            ...oldPic,
+            comments: oldPic.comments.filter(c => c.id !== id)
+        }))
+    };
+
+    const showOrHideComments = () => {
+        if (visibleComments < picture.comments.length)
+            setVisibleComments(picture.comments.length)
+
+        else
+            setVisibleComments(3)
+    }
+
     useEffect(() => {
         if (!isViewed && picture) {
             sendView();
         }
     }, [picture]);
+
+
 
 
 
@@ -205,6 +252,35 @@ export default function () {
                         <p className="text-white">
                             {picture.description}
                         </p>
+
+                        {
+                            picture?.comments?.length > 0 &&
+                            <div>
+
+                                <div className="comments-container flex flex-col gap-2 mt-4 h-44 overflow-y-auto">
+
+                                    {picture.comments.slice(0, visibleComments).map(c =>
+                                    (<Comment
+                                        user={c.User}
+                                        comment={c}
+                                        onDelete={(id) => { deleteComment(id) }}
+                                        key={`comment-${c.id}`}
+                                    />)
+                                    )}
+
+
+                                </div>
+                                <div>
+
+                                    {picture.comments.length > 3 && <p
+                                        className="text-white font-semibold mt-2 cursor-pointer"
+                                        onClick={showOrHideComments}
+                                    >
+                                        {visibleComments < picture.comments.length ? 'View More' : 'View less'}
+                                    </p>}
+                                </div>
+                            </div>
+                        }
                     </div>
                     <div>
                         <div className="stats-container flex gap-4 items-center">
@@ -212,7 +288,7 @@ export default function () {
                                 <HeartIcon
                                     className="text-2xl no-hover-icon"
                                 />
-                                <div className="text-lg font-bold">
+                                <div className="text-lg font-bold text-white">
                                     {picture.likes.length}
                                 </div>
                             </div>
@@ -220,7 +296,7 @@ export default function () {
                                 <DownloadIcon
                                     className="text-2xl no-hover-icon"
                                 />
-                                <div className="text-lg font-bold">
+                                <div className="text-lg font-bold text-white">
                                     {picture?.downloads?.length || 0}
                                 </div>
                             </div>
@@ -228,18 +304,35 @@ export default function () {
                                 <ViewIcon
                                     className="text-2xl no-hover-icon"
                                 />
-                                <div className="text-lg font-bold">
+                                <div className="text-lg font-bold text-white">
                                     {picture?.views?.length || 0}
+                                </div>
+                            </div>
+
+                            <div className="likes-counter flex items-center gap-1 text-theme">
+                                <CommentIcon
+                                    className="text-2xl no-hover-icon"
+                                />
+                                <div className="text-lg font-bold text-white">
+                                    {picture?.comments?.length || 0}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="add-comment mt-4">
+                        <div className="add-comment mt-4 flex items-center justify-between">
                             <input
                                 type="text"
                                 name="comment"
                                 placeholder="Add a comment"
+                                className="w-3/4"
+                                value={newComment}
+                                onChange={(e) => { setNewComment(e.target.value) }}
+                                onKeyDown={(e) => { if (e.key === 'Enter') sendComment() }}
                             />
+                            {newComment && <SendIcon
+                                className="text-theme text-xl"
+                                onClick={sendComment}
+                            />}
                         </div>
                     </div>
                 </div>

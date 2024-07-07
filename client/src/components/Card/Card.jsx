@@ -22,7 +22,7 @@ export default function ({ picture }) {
 
     const [isVisible, setIsVisible] = useState(pictureState.isVisibile);
     const [imgLoaded, setImgLoaded] = useState(false);
-    const isLiked = pictureState?.likes.find(l => l.userId === authId);
+    const isLiked = pictureState?.likes?.find(l => l.userId === authId);
 
     useEffect(() => {
 

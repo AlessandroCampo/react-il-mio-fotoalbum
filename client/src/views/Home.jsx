@@ -16,8 +16,7 @@ export default function () {
     const fetchPictures = async (page = 1) => {
         if (loadingAuth) return
         try {
-            const { data } = isLoggedIn ? await axiosInstance.get(`pictures/get-feed?page=${page}`) : await axiosInstance.get(`pictures?page=${page}`)
-            console.log(isLoggedIn, data)
+            const { data } = isLoggedIn ? await axiosInstance.get(`pictures/get-feed?page=${page}`) : await axiosInstance.get(`pictures?page=${page}`);
             setTotalPages(data.totalPages);
 
             setPictureList(oldList => {
@@ -43,7 +42,6 @@ export default function () {
                 const triggerPoint = scrollHeight * 0.9;
 
                 if (bottomOfViewport >= triggerPoint) {
-                    console.log('triggered')
                     setLastPage(prevPage => {
                         const nextPage = prevPage + 1;
                         if (nextPage > totalPages) {
