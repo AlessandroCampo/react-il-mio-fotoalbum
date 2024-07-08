@@ -18,7 +18,6 @@ export default function () {
 
 
     const addNewMessage = (newMessage, interId) => {
-        console.log(interId)
         setConversations(oldConversations => {
 
             const newConversations = oldConversations.map(c => {
@@ -60,7 +59,7 @@ export default function () {
     }, [])
 
     useEffect(() => {
-
+        setActiveConversation(conversations[conversations.length - 1])
     }, [conversations])
 
 
